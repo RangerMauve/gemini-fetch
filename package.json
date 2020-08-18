@@ -1,0 +1,33 @@
+{
+  "name": "gemini-fetch",
+  "version": "1.0.0",
+  "description": "Load data from the Gemini protocol the way you would fetch from HTTP in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "bin": "bin.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RangerMauve/gemini-fetch.git"
+  },
+  "keywords": [
+    "gemini",
+    "protocol",
+    "fetch",
+    "get"
+  ],
+  "author": "rangermauve <ranger@mauve.moe> (https://mauve.moe/)",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/RangerMauve/gemini-fetch/issues"
+  },
+  "homepage": "https://github.com/RangerMauve/gemini-fetch#readme",
+  "dependencies": {
+    "@derhuerst/gemini": "github:rangermauve/gemini#protocol-fixes",
+    "make-fetch": "^1.1.0"
+  },
+  "devDependencies": {
+    "tape": "^5.0.1"
+  }
+}
