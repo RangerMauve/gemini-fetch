@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/RangerMauve/gemini-fetch#readme",
   "dependencies": {
-    "@derhuerst/gemini": "github:derhuerst/gemini#f1f6673e6bf6a5443ead336575ddfb989971ea87",
+    "@derhuerst/gemini": "github:derhuerst/gemini",
     "make-fetch": "^1.1.0"
   },
   "devDependencies": {
