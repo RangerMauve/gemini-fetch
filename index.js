@@ -1,4 +1,4 @@
-const request = require('@derhuerst/gemini/client')
+const request = require('@bwestergard/gemini/client')
 const makeFetch = require('make-fetch')
 const { Readable } = require('stream')
 
