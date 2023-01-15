@@ -1,5 +1,5 @@
-const test = require('tape')
-const makeGemini = require('./')
+import test from 'tape'
+import makeGemini from './index.js'
 
 test('fetch data from known page', async (t) => {
   try {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const fetch = require('./')()
+import fetch from './index.js'
 
 const url = process.argv[2]
 
