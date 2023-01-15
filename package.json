@@ -1,6 +1,6 @@
 {
   "name": "gemini-fetch",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Load data from the Gemini protocol the way you would fetch from HTTP in JavaScript",
   "main": "index.js",
   "scripts": {
