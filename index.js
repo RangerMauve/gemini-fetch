@@ -89,8 +89,8 @@ function makeForm (prompt, type = 'text') {
   return `<!DOCTYPE html>
 <title>${prompt}</title>
 <form method="post" enctype="application/x-www-form-urlencoded">
-  <p>${prompt}</p>
-  <input name="${INPUT_FIELD}" type="${type}">
+  <h1>${prompt}</h1>
+  <input autofocus name="${INPUT_FIELD}" type="${type}">
   <input type="submit">
 </form>
 `
