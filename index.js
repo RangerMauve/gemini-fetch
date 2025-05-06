@@ -1,6 +1,5 @@
 import request from '@derhuerst/gemini/client.js'
-import makeFetch from 'make-fetch'
-import { Readable } from 'stream'
+import { makeRoutedFetch } from 'make-fetch'
 
 const DEFAULT_OPTS = {
   followRedirects: true,
@@ -10,45 +9,89 @@ const DEFAULT_OPTS = {
   }
 }
 
+const MIME_TEXT_HTML = 'text/html; charset=utf-8'
+// const MIME_TEXT_PLAIN = 'text/plain; charset=utf-8'
+const INPUT_FIELD = 'input'
+
 export default function makeGemini (opts = {}) {
+  const { fetch, router } = makeRoutedFetch()
   const finalOpts = { ...DEFAULT_OPTS, opts }
-  return makeFetch(({ url, referrer }, sendResponse) => {
-    const toRequest = new URL(url, referrer)
 
-    request(toRequest.href, finalOpts, (err, res) => {
+  router.get('gemini://*/**', async ({ url, referrer }) => { /**/
+    const res = await requestGemini(url, finalOpts)
+    const { statusCode, statusMessage: statusText, meta } = res
+    if (statusCode === 11) {
+      // Request password input
+      return {
+        status: 200,
+        headers: { 'Content-Type': MIME_TEXT_HTML },
+        body: makeForm(meta, 'password')
+      }
+    } else if (statusCode >= 10 && statusCode < 20) {
+      // Request regular input
+      return {
+        status: 200,
+        headers: { 'Content-Type': MIME_TEXT_HTML },
+        body: makeForm(meta)
+      }
+    }
+
+    const isOK = (statusCode >= 10) && (statusCode < 300)
+
+    // If the response is 200, the mime type should be the meta tag
+    const headers = isOK ? { 'Content-Type': meta } : {}
+
+    // If the response had an error, use the meta as the response body
+    const body = isOK ? res : meta
+    return {
+      status: statusCode * 10,
+      statusText,
+      headers,
+      body
+    }
+  })
+
+  router.post('gemini://*/**', async (request) => { /**/
+    const { url } = request
+    const formData = await request.formData()
+    const input = formData.get(INPUT_FIELD)
+    if (!input) {
+      throw new Error(`Expected ${INPUT_FIELD} field in form submission`)
+    }
+
+    const location = new URL(url)
+    location.search = input
+
+    return {
+      status: 302,
+      headers: {
+        Location: location.href
+      }
+    }
+  })
+
+  return fetch
+}
+
+async function requestGemini (url, opts) {
+  return new Promise((resolve, reject) => {
+    request(url, opts, (err, res) => {
       if (err) {
-        sendResponse({
-          statusCode: 500,
-          headers: {},
-          data: intoStream(err.stack)
-        })
+        reject(err)
       } else {
-        const { statusCode, statusMessage: statusText, meta } = res
-
-        // TODO: Figure out what to do with `1x` status codes
-        const isOK = (statusCode >= 10) && (statusCode < 300)
-
-        // If the response is 200, the mime type should be the meta tag
-        const headers = isOK ? { 'Content-Type': meta } : {}
-
-        // If the response had an error, use the meta as the response body
-        const data = isOK ? res : intoStream(meta)
-        sendResponse({
-          statusCode: statusCode * 10,
-          statusText,
-          headers,
-          data
-        })
+        resolve(res)
       }
     })
   })
 }
 
-export function intoStream (data) {
-  return new Readable({
-    read () {
-      this.push(data)
-      this.push(null)
-    }
-  })
+function makeForm (prompt, type = 'text') {
+  return `<!DOCTYPE html>
+<title>${prompt}</title>
+<form method="post" enctype="application/x-www-form-urlencoded">
+  <p>${prompt}</p>
+  <input name="${INPUT_FIELD}" type="${type}">
+  <input type="submit">
+</form>
+`
 }
